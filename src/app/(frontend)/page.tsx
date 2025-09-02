@@ -1,59 +1,24 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
-import { getPayload } from 'payload'
-import React from 'react'
-import { fileURLToPath } from 'url'
+import Link from 'next/link';
 
-import config from '@/payload.config'
-import './globals.css'
-
-export default async function HomePage() {
-  const headers = await getHeaders()
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
-
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
-
+export default function LandingPage() {
   return (
-    <div className="home">
-      <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/main/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        {!user && <h1 className='text-5xl font-bold'>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
-        <div className="links">
-          <a
-            className="admin"
-            href={payloadConfig.routes.admin}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Go to admin panel
-          </a>
-          <a
-            className="docs"
-            href="https://payloadcms.com/docs"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Documentation
-          </a>
+    <div className="min-h-screen flex flex-col">
+      <header className="bg-blue-600 text-white p-4">
+        <h1 className="text-2xl font-bold">Mobiheal Docs</h1>
+      </header>
+      <main className="flex-grow flex items-center justify-center">
+        <div className="text-center">
+          <Link href="/docs/assigning-and-pushing-apps"> {/* Adjust to your first article slug */}
+            <button className="bg-green-500 text-white px-4 py-2 mr-4">Get Started</button>
+          </Link>
+          <Link href="/docs">
+            <button className="bg-blue-500 text-white px-4 py-2">Docs</button>
+          </Link>
         </div>
-      </div>
-      <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
-      </div>
+      </main>
+      <footer className="bg-gray-800 text-white p-4 text-center">
+        © 2025 Mobiheal
+      </footer>
     </div>
-  )
+  );
 }

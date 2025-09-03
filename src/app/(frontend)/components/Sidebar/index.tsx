@@ -22,7 +22,7 @@ export default function Sidebar({ categories, subcategories, docs, selectedSlug 
     docs.filter(doc => doc.parent?.value?.id === parentId && doc.parent?.relationTo === relationTo);
 
   return (
-    <aside className="w-64 bg-gray-100 p-4 overflow-y-auto">
+    <aside className="w-64 bg-black p-4 overflow-y-auto">
       <h2 className="text-lg font-bold mb-4">Documentation</h2>
       <ul>
         {categories.map(cat => (

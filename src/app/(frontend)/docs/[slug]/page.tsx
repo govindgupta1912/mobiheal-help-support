@@ -11,7 +11,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
   const { docs: subcategories } = await payload.find({ collection: 'subcategories', limit: 0 });
 
   const { docs: [article] } = await payload.find({
-    collection: 'docs',
+    collection: 'articles',
     where: { slug: { equals: params.slug } },
   });
 
@@ -32,6 +32,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 // Generate static paths for SSG (optional, for better perf)
 export async function generateStaticParams() {
   const payload = await getPayloadClient();
-  const { docs } = await payload.find({ collection: 'docs', limit: 0 });
+  const { docs } = await payload.find({ collection: 'articles', limit: 0 });
   return docs.map((doc: any) => ({ slug: doc.slug }));
 }

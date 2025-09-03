@@ -1,48 +1,21 @@
 'use client';
 
-import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import { ContentEditable } from '@lexical/react/LexicalContentEditable';
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
-import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { RichText } from '@payloadcms/richtext-lexical/react';
+import { format } from "date-fns";
 
-// Import nodes
-import { HeadingNode } from '@lexical/rich-text';
-import { ListNode, ListItemNode } from '@lexical/list';
-import { QuoteNode } from '@lexical/rich-text';
-import { CodeNode } from '@lexical/code';
-
-interface ArticleContentProps {
-  article: any;
-}
-
-export default function ArticleContent({ article }: ArticleContentProps) {
-  const initialConfig = {
-    namespace: 'article',
-    theme: {},
-    onError: (error: Error) => console.error(error),
-    nodes: [HeadingNode, ListNode, ListItemNode, QuoteNode, CodeNode], // ✅ register needed nodes
-    editorState: article?.content
-      ? JSON.stringify(article.content) // ✅ pass JSON directly
-      : undefined,
-    editable: false, // read-only
-  };
-
+export default function ArticleContent({ article }: { article: any }) {
+   const publishedDate = article.publishDate
+    ? format(new Date(article.publishDate), "yyyy-MM-dd") // stable format
+    : "";
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
       <p className="text-gray-500 mb-4">
-        Read time: {article.readTime} min | Published:{' '}
-        {new Date(article.publishDate).toLocaleDateString()}
+        Read time: {article.readTime} min | Published: {publishedDate}
       </p>
-      <LexicalComposer initialConfig={initialConfig}>
-        <RichTextPlugin
-          contentEditable={<ContentEditable className="prose max-w-none" />}
-          placeholder={<div>Empty</div>}
-          ErrorBoundary={LexicalErrorBoundary}
-        />
-        <HistoryPlugin />
-      </LexicalComposer>
+      <div className="prose max-w-none">
+        <RichText data={article.content} />
+      </div>
     </div>
   );
 }

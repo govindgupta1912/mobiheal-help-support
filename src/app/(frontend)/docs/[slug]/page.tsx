@@ -1,18 +1,21 @@
-import Sidebar from '../../components/Sidebar';
-import ArticleContent from '../../components/ArticleContent';
-import { getPayloadClient } from '../../lib/payload';
+import ArticleContent from "../../components/ArticleContent";
+import Sidebar from "../../components/Sidebar";
+import { getPayloadClient } from "../../lib/payload";
 
-export default async function ArticlePage({ params }: { params: { slug: string } }) {
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;   // ✅ await first
+
   const payload = await getPayloadClient();
 
-  // Fetch all for sidebar + specific article
+  // Sidebar data
   const { docs: allDocs } = await payload.find({ collection: 'articles', limit: 0 });
   const { docs: categories } = await payload.find({ collection: 'categories', limit: 0 });
   const { docs: subcategories } = await payload.find({ collection: 'subcategories', limit: 0 });
 
+  // Article data
   const { docs: [article] } = await payload.find({
     collection: 'articles',
-    where: { slug: { equals: params.slug } },
+    where: { slug: { equals: slug } },
   });
 
   if (!article) {
@@ -21,17 +24,15 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar categories={categories} subcategories={subcategories} docs={allDocs} selectedSlug={params.slug} />
+      <Sidebar
+        categories={categories}
+        subcategories={subcategories}
+        docs={allDocs}
+        selectedSlug={slug} // ✅ safe now
+      />
       <main className="flex-grow p-8">
         <ArticleContent article={article} />
       </main>
     </div>
   );
-}
-
-// Generate static paths for SSG (optional, for better perf)
-export async function generateStaticParams() {
-  const payload = await getPayloadClient();
-  const { docs } = await payload.find({ collection: 'articles', limit: 0 });
-  return docs.map((doc: any) => ({ slug: doc.slug }));
 }

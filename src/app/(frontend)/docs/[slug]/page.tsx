@@ -1,4 +1,5 @@
 import ArticleContent from "../../components/ArticleContent";
+import SearchComponent from "../../components/SearchComponent";
 import Sidebar from "../../components/Sidebar";
 import { getPayloadClient } from "../../lib/payload";
 
@@ -24,6 +25,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="min-h-screen flex">
+             
       <Sidebar
         categories={categories}
         subcategories={subcategories}
@@ -31,6 +33,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         selectedSlug={slug} // ✅ safe now
       />
       <main className="flex-grow p-8">
+         <div className="mb-6">
+                <SearchComponent articles={allDocs} />
+              </div>
         <ArticleContent article={article} />
       </main>
     </div>

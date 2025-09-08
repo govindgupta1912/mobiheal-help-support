@@ -73,6 +73,8 @@ export interface Config {
     articles: Article;
     categories: Category;
     subcategories: Subcategory;
+    menus: Menu;
+    'help-search': HelpSearch;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -85,6 +87,8 @@ export interface Config {
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     subcategories: SubcategoriesSelect<false> | SubcategoriesSelect<true>;
+    menus: MenusSelect<false> | MenusSelect<true>;
+    'help-search': HelpSearchSelect<false> | HelpSearchSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -422,6 +426,76 @@ export interface Subcategory {
   createdAt: string;
 }
 /**
+ * Manage menus for navbar or sidebar with dynamic, orderable items.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menus".
+ */
+export interface Menu {
+  id: string;
+  title: string;
+  slug: string;
+  items?:
+    | {
+        label?: string | null;
+        type: 'category' | 'subcategory' | 'article' | 'custom';
+        category?: (string | null) | Category;
+        subcategory?: (string | null) | Subcategory;
+        article?: (string | null) | Article;
+        url?: string | null;
+        children?:
+          | {
+              label?: string | null;
+              type: 'category' | 'subcategory' | 'article' | 'custom';
+              category?: (string | null) | Category;
+              subcategory?: (string | null) | Subcategory;
+              article?: (string | null) | Article;
+              url?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This is a collection of automatically created search results. These results are used by the global site search and will be updated automatically as documents in the CMS are created or updated.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "help-search".
+ */
+export interface HelpSearch {
+  id: string;
+  title?: string | null;
+  priority?: number | null;
+  doc: {
+    relationTo: 'articles';
+    value: string | Article;
+  };
+  summary?: string | null;
+  contentExcerpt?: string | null;
+  categoryData?:
+    | {
+        name?: string | null;
+        slug?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  subcategoryData?:
+    | {
+        name?: string | null;
+        slug?: string | null;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
@@ -451,6 +525,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'subcategories';
         value: string | Subcategory;
+      } | null)
+    | ({
+        relationTo: 'menus';
+        value: string | Menu;
+      } | null)
+    | ({
+        relationTo: 'help-search';
+        value: string | HelpSearch;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -678,6 +760,67 @@ export interface SubcategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   category?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menus_select".
+ */
+export interface MenusSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  items?:
+    | T
+    | {
+        label?: T;
+        type?: T;
+        category?: T;
+        subcategory?: T;
+        article?: T;
+        url?: T;
+        children?:
+          | T
+          | {
+              label?: T;
+              type?: T;
+              category?: T;
+              subcategory?: T;
+              article?: T;
+              url?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "help-search_select".
+ */
+export interface HelpSearchSelect<T extends boolean = true> {
+  title?: T;
+  priority?: T;
+  doc?: T;
+  summary?: T;
+  contentExcerpt?: T;
+  categoryData?:
+    | T
+    | {
+        name?: T;
+        slug?: T;
+        description?: T;
+        id?: T;
+      };
+  subcategoryData?:
+    | T
+    | {
+        name?: T;
+        slug?: T;
+        description?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

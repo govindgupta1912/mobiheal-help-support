@@ -231,7 +231,12 @@ export default buildConfig({
       },
       beforeSync: ({ originalDoc, searchDoc }) => {
         const contentExcerpt = originalDoc.content ? lexicalToText(originalDoc.content).slice(0, 500) + '...' : '';
-        let parentData = [];
+       let parentData: {
+          type: string;
+          name: string;
+          slug: string;
+          description: string;
+        }[] = [];
         if (originalDoc.parent && originalDoc.parent.relationTo && originalDoc.parent.value) {
           const parentValue = originalDoc.parent.value;
           parentData = [{

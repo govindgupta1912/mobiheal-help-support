@@ -474,18 +474,11 @@ export interface HelpSearch {
     relationTo: 'articles';
     value: string | Article;
   };
-  summary?: string | null;
+  excerpt?: string | null;
   contentExcerpt?: string | null;
-  categoryData?:
+  parentData?:
     | {
-        name?: string | null;
-        slug?: string | null;
-        description?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  subcategoryData?:
-    | {
+        type?: string | null;
         name?: string | null;
         slug?: string | null;
         description?: string | null;
@@ -803,19 +796,12 @@ export interface HelpSearchSelect<T extends boolean = true> {
   title?: T;
   priority?: T;
   doc?: T;
-  summary?: T;
+  excerpt?: T;
   contentExcerpt?: T;
-  categoryData?:
+  parentData?:
     | T
     | {
-        name?: T;
-        slug?: T;
-        description?: T;
-        id?: T;
-      };
-  subcategoryData?:
-    | T
-    | {
+        type?: T;
         name?: T;
         slug?: T;
         description?: T;

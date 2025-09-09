@@ -1,17 +1,14 @@
-'use client';
-
-import { RichText } from '@payloadcms/richtext-lexical/react';
 import { format } from "date-fns";
 import { Calendar, Clock } from "lucide-react";
+import RichTextWithZoom from "../RichTextWithZoom";
 
 export default function ArticleContent({ article }: { article: any }) {
   const publishedDate = article.publishDate
-    ? format(new Date(article.publishDate), "MMMM dd, yyyy") // Friendlier format
+    ? format(new Date(article.publishDate), "MMMM dd, yyyy")
     : "";
 
   return (
     <article className="max-w-4xl mx-auto px-6 py-8">
-      {/* Header */}
       <header className="border-b border-gray-200 pb-6 mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">{article.title}</h1>
 
@@ -30,11 +27,9 @@ export default function ArticleContent({ article }: { article: any }) {
           )}
         </div>
       </header>
-{/* Content */}
-<div className="prose prose-gray max-w-none leading-relaxed">
-  <RichText data={article.content} />
-</div>
 
+      {/* Content */}
+      <RichTextWithZoom data={article.content} />
     </article>
   );
 }

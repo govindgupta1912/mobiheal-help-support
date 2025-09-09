@@ -105,8 +105,8 @@
 
 
 // storage-adapter-import-placeholder
-import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { payloadCloudPlugin } from '@payloadcms/payload-cloud'
+import { mongooseAdapter } from '@payloadcms/db-mongodb';
+import { payloadCloudPlugin } from '@payloadcms/payload-cloud';
 import {
   lexicalEditor,
   BoldFeature,
@@ -130,23 +130,24 @@ import {
   HorizontalRuleFeature,
   FixedToolbarFeature,
   EXPERIMENTAL_TableFeature,
-} from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { buildConfig } from 'payload'
-import { fileURLToPath } from 'url'
-import sharp from 'sharp'
-import { searchPlugin } from '@payloadcms/plugin-search' // Import search plugin
+} from '@payloadcms/richtext-lexical';
+import path from 'path';
+import { buildConfig } from 'payload';
+import { fileURLToPath } from 'url';
+import sharp from 'sharp';
+import { searchPlugin } from '@payloadcms/plugin-search';
+import { lexicalToText } from './app/(frontend)/utils/lexicalToText';
 
-import { Users } from './collections/Users'
-import { Media } from './collections/Media'
-import { HelpArticles } from './collections/HelpArticles'
-import Articles from './collections/Articles'
-import Categories from './collections/Categories'
-import Subcategories from './collections/Subcategories'
-import { Menus } from './collections/Menus'
+import { Users } from './collections/Users';
+import { Media } from './collections/Media';
+import { HelpArticles } from './collections/HelpArticles';
+import Articles from './collections/Articles';
+import Categories from './collections/Categories';
+import Subcategories from './collections/Subcategories';
+import { Menus } from './collections/Menus';
 
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 export default buildConfig({
   admin: {
@@ -200,13 +201,13 @@ export default buildConfig({
   plugins: [
     payloadCloudPlugin(),
     searchPlugin({
-      collections: ['articles'], // Sync Articles collection
+      collections: ['articles'],
       searchOverrides: {
         slug: 'help-search',
         fields: ({ defaultFields }) => [
-          ...defaultFields, // Includes title, slug, priority
+          ...defaultFields,
           {
-            name: 'summary',
+            name: 'excerpt',
             type: 'text',
             index: true,
           },
@@ -216,19 +217,10 @@ export default buildConfig({
             index: true,
           },
           {
-            name: 'categoryData',
+            name: 'parentData',
             type: 'array',
             fields: [
-              { name: 'name', type: 'text' },
-              { name: 'slug', type: 'text' },
-              { name: 'description', type: 'text' },
-            ],
-            index: true,
-          },
-          {
-            name: 'subcategoryData',
-            type: 'array',
-            fields: [
+              { name: 'type', type: 'text' },
               { name: 'name', type: 'text' },
               { name: 'slug', type: 'text' },
               { name: 'description', type: 'text' },
@@ -238,39 +230,23 @@ export default buildConfig({
         ],
       },
       beforeSync: ({ originalDoc, searchDoc }) => {
-        // Handle richText content (Lexical)
-        let contentExcerpt = '';
-        if (originalDoc.content) {
-          // Extract plain text from Lexical richText (JSON)
-          const contentString = typeof originalDoc.content === 'string'
-            ? originalDoc.content
-            : JSON.stringify(originalDoc.content).replace(/[{}\[\]]/g, ' ').slice(0, 300) + '...';
-          contentExcerpt = contentString;
+        const contentExcerpt = originalDoc.content ? lexicalToText(originalDoc.content).slice(0, 500) + '...' : '';
+        let parentData = [];
+        if (originalDoc.parent && originalDoc.parent.relationTo && originalDoc.parent.value) {
+          const parentValue = originalDoc.parent.value;
+          parentData = [{
+            type: originalDoc.parent.relationTo,
+            name: parentValue.name || '',
+            slug: parentValue.slug || '',
+            description: parentValue.description || '',
+          }];
         }
-
-        // Flatten relationships
-        const categoryData = Array.isArray(originalDoc.categories)
-          ? originalDoc.categories.map(cat => ({
-              name: cat.name,
-              slug: cat.slug,
-              description: cat.description || '',
-            }))
-          : [];
-        const subcategoryData = Array.isArray(originalDoc.subcategories)
-          ? originalDoc.subcategories.map(sub => ({
-              name: sub.name,
-              slug: sub.slug,
-              description: sub.description || '',
-            }))
-          : [];
-
         return {
           ...searchDoc,
           title: originalDoc.title,
-          summary: originalDoc.summary,
+          excerpt: originalDoc.excerpt,
           contentExcerpt,
-          categoryData,
-          subcategoryData,
+          parentData,
         };
       },
       defaultPriorities: {
@@ -280,4 +256,4 @@ export default buildConfig({
       reindexBatchSize: 50,
     }),
   ],
-})
+});
